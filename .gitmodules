@@ -1,0 +1,4 @@
+[submodule "pySTICS"]
+	path = pase/CROPS/STICS/PYSTICS/pySTICS
+	url = https://gitlab.uliege.be/deal-public/pySTICS.git
+	branch = develop

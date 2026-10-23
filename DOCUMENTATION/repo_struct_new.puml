@@ -1,0 +1,51 @@
+@startwbs
+
+footer v3 2023-08-08  Validated by AB, RB and NdC
+
+* PASE
+**: DOCUMENTATION
+Diagrammes UML, etc.;
+
+** INPUTS
+
+***: SCENARIOS
+Location, weather, timeframe and 
+numerical simulation (dt, mesh resolution) parametrization;
+
+***: WEATHER_FILES
+Replaces METEO folder;
+
+***: HARDWARE
+Cells, modules, panels, structures, diffusers parametrization;
+**** LENTICULAR_DIFFUSING_SHEETS
+**** MATERIALS
+**** PLANTS
+**** PV_CELLS
+**** PV_MODULES
+**** STRUCTURES
+
+***: AV_CENTRAL
+Agrivoltaic central parametrization 
+(panels repetitions, spacing between rows, central azimuth, crops, etc.) ;
+
+***:CROPS
+Crops parametrization;
+
+**: MODULES
+Python modules;
+*** CROPS
+*** DATA_MANAGEMENT
+*** ENVIRONMENT
+*** PHOTOVOLTAICS
+***_ user_support_tools.py
+
+** OUTPUTS
+***: INTERMEDIATE RESULTS
+Utile pour de longues simulations, 
+ou si on veut pouvoir réutiliser des résultats intermédiaires;
+*** GRAPHS
+
+** TEMPORARY_FILES
+
+@endwbs
+

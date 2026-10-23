@@ -1,0 +1,34 @@
+# ============== [HUGO - PILOTAGE] FICHIER NOUVEAU ==============
+# Exemple de stratégie mixte :
+#   - anti-tracking pendant 6 semaines au printemps (protection / croissance des cultures)
+#   - en été, tracking uniquement entre 11h et 14h (production au pic solaire),
+#     anti-tracking le reste de la journée
+#   - tracking classique le reste de l'année (default_mode)
+#
+# Rappels sur les règles :
+#   - la PREMIÈRE règle qui matche gagne (l'ordre compte)
+#   - date_start / date_end : "MM-DD", bornes incluses, indépendant de l'année,
+#     fenêtre à cheval sur le nouvel an autorisée (ex. 12-01 -> 02-28)
+#   - hour_start / hour_end : heure de début incluse, heure de fin EXCLUE,
+#     fenêtre à cheval sur minuit autorisée (ex. 22 -> 5)
+#   - mode: tracking | anti_tracking | fixed (avec fixed_angle en degrés)
+name: antitrack_printemps_et_track_midi_ete
+description: Anti-tracking 6 semaines au printemps + tracking 11h-14h l'ete
+default_mode: tracking
+rules:
+  - name: protection_cultures_printemps
+    date_start: "04-01"
+    date_end: "05-15"
+    mode: anti_tracking
+
+  - name: production_midi_ete
+    date_start: "06-01"
+    date_end: "08-31"
+    hour_start: 11
+    hour_end: 14
+    mode: tracking
+
+  - name: antitrack_reste_journee_ete
+    date_start: "06-01"
+    date_end: "08-31"
+    mode: anti_tracking

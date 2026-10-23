@@ -1,0 +1,28 @@
+name: pase-2026-07
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12
+  - conda
+  - conda-libmamba-solver
+  - pip
+  - git  # needed at build time: setuptools-scm shells out to git to derive the version
+  - numpy
+  - matplotlib-base
+  - pandas
+  - conda-forge::vtk>=9.3,<9.5
+  - conda-forge::vtk-base>=9.3,<9.5
+  - trimesh
+  - rtree
+  - windrose
+  - scipy
+  - pvlib>0.15
+  - pvlib-python>0.15
+  - pyvista
+  - pip:
+    - embreex
+  - pyyaml
+  - seaborn
+  - yaml
+  - pytest==9.0.2
+  - pytest-cov

@@ -1,0 +1,114 @@
+[build-system]
+requires = ["setuptools>=77", "setuptools-scm>=8"]
+build-backend = "setuptools.build_meta"
+
+[project]
+# Distribution name (what you `pip install`); the import package stays `pase`.
+# `pase` was taken on PyPI by an unrelated project, hence `pase-agrivoltaics`.
+name = "pase-agrivoltaics"
+dynamic = ["version"]
+description = "Python Agrivoltaic Simulation Environment"
+readme = "README.md"
+requires-python = ">=3.12"
+license = "MIT"
+license-files = ["LICENSE", "LICENSE-3RD-PARTY"]
+authors = [
+    { name = "Roxane Bruhwyler", email = "roxane.bruhwyler@uliege.be" },
+    { name = "Arnaud Bouvry", email = "abouvry@uliege.be" },
+    { name = "Louis Lemaire", email = "louis.lemaire@uliege.be" },
+    { name = "Julien Philippart", email = "jphilippart@uliege.be" },
+    { name = "Selim Grote", email = "Selim.Grote@uliege.be" },
+    { name = "Frédéric Lebeau", email = "f.lebeau@uliege.be" },
+    { name = "University of Liège - Digital Energy and Agriculture Lab (DEAL)" },
+]
+keywords = [
+    "agrivoltaics",
+    "photovoltaics",
+    "solar-energy",
+    "crop-modeling",
+    "simulation",
+    "agriculture",
+    "renewable-energy",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Physics",
+]
+dependencies = [
+    "numpy",
+    "pandas",
+    "scipy",
+    "pvlib>=0.15",
+    "pyyaml",
+    "trimesh",
+    "rtree",
+    "pyvista",
+    "matplotlib",
+    "embreex",
+]
+
+[project.urls]
+Homepage = "https://gitlab.uliege.be/deal-public/pase"
+Repository = "https://gitlab.uliege.be/deal-public/pase"
+Documentation = "https://gitlab.uliege.be/deal-public/pase/-/wikis/home"
+Issues = "https://gitlab.uliege.be/deal-public/pase/-/issues"
+
+[tool.setuptools_scm]
+version_file = "pase/_version.py"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "--cov=pase --cov-report=term-missing --cov-report=html"
+markers = [
+    "network: tests that hit a live external service (e.g. the PVGIS weather API); deselected on the release path with -m 'not network'",
+]
+
+[tool.setuptools]
+# setuptools-scm otherwise auto-ships every VCS-tracked file (e.g. the excluded
+# STICS sources leak in as data); ship only what we declare explicitly below.
+include-package-data = false
+
+[tool.setuptools.packages.find]
+include = ["pase*"]
+exclude = ["pase.CROPS.CPlantBox*", "pase.CROPS.STICS*"]
+namespaces = true
+
+[tool.setuptools.package-data]
+"pase" = ["DATA/*.csv"]
+
+[tool.coverage.run]
+branch = true
+source = ["pase"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+
+[tool.black]
+line-length = 88
+target-version = ['py312']
+exclude = '''
+/(
+    \.git
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+[tool.isort]
+profile = "black"
+
+[tool.mypy]
+python_version = "3.12"
+warn_unused_configs = true
+disallow_untyped_defs = true
+ignore_missing_imports = true

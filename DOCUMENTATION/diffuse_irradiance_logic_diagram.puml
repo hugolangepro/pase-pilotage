@@ -1,0 +1,49 @@
+@startuml
+'object diagram
+
+object discrete_sky
+object diffuse_weights_map
+object radiance_distr
+object diffuse_mask
+object diffuse_shaded_weights_map
+object shaded_radiance_contrib
+object DHI
+object diff_irradiance_map
+object light_data 
+
+radiance_distr : shape: v(nSkyPatches)
+
+diffuse_mask : result of ray casting (boolean mask)
+diffuse_mask : shape: mat(nSourcePoints*nSkyPatches)
+
+diffuse_weights_map : shape: v(nSkyPatches)
+
+diffuse_shaded_weights_map : comparable to prev. version's diff_map
+diffuse_shaded_weights_map : shape: mat(nSourcePoints * nSkyPatches)
+
+shaded_radiance_contrib : shape: mat(nSourcePoints * nSkyPatches)
+
+DHI : shape: int
+
+diff_irradiance_map : shape: v(nSourcePoints)
+
+light_data : DataFrame
+light_data : -Sun azimuth
+light_data : -Sun elevation
+light_data : -CIE sky type
+
+discrete_sky --> diffuse_weights_map: "x cos(z) \n x norm_surf_area"
+diffuse_mask --> diffuse_shaded_weights_map
+diffuse_weights_map --> diffuse_shaded_weights_map
+
+discrete_sky --> radiance_distr
+light_data --> radiance_distr
+
+diffuse_shaded_weights_map--> shaded_radiance_contrib
+radiance_distr--> shaded_radiance_contrib
+
+shaded_radiance_contrib--> diff_irradiance_map
+DHI--> diff_irradiance_map
+
+
+@enduml

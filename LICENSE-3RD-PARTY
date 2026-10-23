@@ -1,0 +1,14 @@
+List of dependancies and their own license :
+
+- matplotlib	License: PSF (Copyright (c) 2012- Matplotlib Development Team; All Rights Reserved)                                        https://pypi.org/project/matplotlib/
+- numpy	Licence: BSD (Copyright (c) 2005-2023, NumPy Developers)	                                                              https://pypi.org/project/numpy/	
+- pandas	License: BSD (BSD 3-Clause License Copyright (c) 2008-2011, AQR Capital Management, LLC, Lambda Foundry, Inc. and...)	https://pypi.org/project/pandas/
+- pvlib	License: BSD-3-Clause (Copyright (c) 2023 pvlib python Contributors,
+                                      Copyright (c) 2014 PVLIB python Development Team, 
+                                      Copyright (c) 2013 Sandia National Laboratories)	                                              https://pypi.org/project/pvlib/
+- pyvista	License: MIT (Copyright (c) 2017-2024 The PyVista Developers)                                                              https://pypi.org/project/pyvista/
+- PyYAML	License: MIT (Copyright (c) 2017-2021 Ingy döt Net, Copyright (c) 2006-2016 Kirill Simonov)                                https://pypi.org/project/PyYAML/
+- Requests	License: Apache-2.0 (Copyright 2019 Kenneth Reitz)                                                                         https://pypi.org/project/requests/
+- scipy	License: BSD-3-Clause (Copyright (c) 2001-2002 Enthought, Inc. 2003-2024, SciPy Developers. All rights reserved)           https://pypi.org/project/scipy/
+- vtk	        License: BSD (Copyright (c) 2008-Present Ken Martin, Will Schroeder, Bill Lorensen. All rights reserved.)                  https://pypi.org/project/vtk/
+- xmltodict	License: MIT (Copyright (C) 2012 Martin Blech and individual contributors.)                                                https://pypi.org/project/xmltodict/

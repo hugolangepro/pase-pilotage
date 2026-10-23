@@ -1,0 +1,8 @@
+# ============== [HUGO - PILOTAGE] FICHIER NOUVEAU ==============
+# Anti-tracking toute l'année : les panneaux restent "en tranche" face au soleil
+# (tilt = angle de tracking vrai ± 90°) -> captation directe minimale,
+# lumière maximale au sol pour les cultures. Cas extrême de comparaison.
+name: antitrack_pur
+description: Anti-tracking toute l'annee (lumiere maximale au sol)
+default_mode: anti_tracking
+rules: []

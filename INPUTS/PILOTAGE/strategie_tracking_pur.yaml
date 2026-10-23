@@ -1,0 +1,8 @@
+# ============== [HUGO - PILOTAGE] FICHIER NOUVEAU ==============
+# Stratégie de référence : tracking classique toute l'année, aucune règle.
+# Sert de référence de non-régression (doit reproduire le comportement
+# historique de PASE, au bugfix de limitation d'angle près).
+name: tracking_pur
+description: Tracking classique toute l'annee (reference)
+default_mode: tracking
+rules: []

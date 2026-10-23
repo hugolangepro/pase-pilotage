@@ -1,0 +1,175 @@
+image: mambaorg/micromamba:1.5.6
+
+stages:
+  - test
+  - build
+  - publish
+
+variables:
+  CONDA_ENV_NAME: ci-env
+  ENV_YML: environment_ci.yml
+  # Full clone (with tags) so setuptools-scm can derive the version from the
+  # latest git tag. The default shallow clone omits it (the last tag is
+  # hundreds of commits back), which makes `pip install -e .` fail.
+  GIT_DEPTH: 0
+  # micromamba uses a read-only root; create envs under /tmp or $CI_PROJECT_DIR/.venv
+  MAMBA_ROOT_PREFIX: "$CI_PROJECT_DIR/.mamba"
+  MAMBA_CACHE_DIR: "$CI_PROJECT_DIR/.mamba_cache"
+  # avoid interactive backends in CI
+  MPLBACKEND: Agg
+
+cache:
+  key:
+    files:
+      - environment_ci.yml
+  paths:
+    - .mamba_cache/pkgs/   # cached conda packages
+
+before_script:
+  # --- Diagnostics ---
+  - echo "=== Python and cache diagnostics ==="
+  - python --version || true
+  - if [ -d "$MAMBA_CACHE_DIR/pkgs" ]; then du -sh $MAMBA_CACHE_DIR/pkgs || true; else echo "No cache yet"; fi
+
+  # create conda environment from your environment YAML
+  - echo "=== Creating conda environment ==="
+  - |
+    if [ ! -f "$ENV_YML" ]; then
+      echo "Environment file $ENV_YML not found. Listing repo root:"
+      ls -la
+      exit 1
+    fi
+
+  # Increase file descriptor limit to 65536
+  - echo "Increasing file descriptor limit"
+  - ulimit -n 65536 || true
+
+  # create the environment using micromamba for speed (non-root)
+  - micromamba create -y -n "$CONDA_ENV_NAME" -f "$ENV_YML"
+
+  # activate the environment for the remainder of the script
+  - eval "$(micromamba shell hook)"
+  - micromamba activate "$CONDA_ENV_NAME"
+
+  # ensure pytest is available (in case env yml omitted it)
+  - python -m pytest --version
+  - python --version
+
+  # sanity import test
+  - |
+    python -c "import importlib,sys; 
+    pkgs=['vtk','embreex','numpy','pandas','trimesh','rtree', 'pyvista'];
+    for p in pkgs: 
+      try: 
+        m=importlib.import_module(p); print(p,'OK', getattr(m,'file',None)) 
+      except Exception as e: 
+        print(p,'IMPORT FAILED:',e,file=sys.stderr); sys.exit(2)"
+  - export PYTHONPATH="$CI_PROJECT_DIR:$PYTHONPATH"
+  # The micromamba image runs as a non-root user while the runner checks out the
+  # repo as another owner; without this, git refuses every operation ("dubious
+  # ownership") so both the fetch below and setuptools-scm fail to read a version.
+  - 'git config --global --add safe.directory "$CI_PROJECT_DIR"'
+  # Ensure the git tags are present so setuptools-scm can describe the version
+  # (on top of GIT_DEPTH: 0; git is available in the activated env). Let it fail
+  # loudly rather than masking git's error.
+  - git fetch --tags --force
+  # Diagnostic: show exactly what setuptools-scm will resolve from git.
+  - git describe --tags --always
+  - pip install -e .
+
+pytest:
+  stage: test
+  # Branch and MR pipelines run the full suite (including live-PVGIS tests).
+  # Release (tag) pipelines use `test_release` below instead.
+  rules:
+    - if: '$CI_COMMIT_TAG == null'
+  script:
+    - pytest -vv --junitxml=junit.xml
+  artifacts:
+    when: always
+    reports:
+      junit: junit.xml
+    paths:
+      - junit.xml
+  allow_failure: false
+
+
+# ---------------------------------------------------------------------------
+# Release pipeline (on a version tag vX.Y.Z):  test -> build -> publish
+# ---------------------------------------------------------------------------
+
+# On a release tag, run the suite WITHOUT the flaky live-PVGIS tests so a
+# network hiccup can never block a release.
+test_release:
+  stage: test
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+/'
+  script:
+    - 'pytest -m "not network" -vv --junitxml=junit.xml'
+  artifacts:
+    when: always
+    reports:
+      junit: junit.xml
+    paths:
+      - junit.xml
+  allow_failure: false
+
+# Build the sdist + wheel and validate them. Runs on version tags and on the
+# `develop` integration branch (to catch packaging breakage early); `main` only
+# ever receives already-tagged release merges, so it is covered by the tag rule.
+# Plain Python image: no conda needed to build, but git is required for
+# setuptools-scm.
+build:
+  stage: build
+  # Full image (buildpack-deps based) ships git out of the box; the slim image
+  # does not, and this locked-down runner forbids apt from installing it
+  # (apt cannot drop to its sandbox user). So avoid apt entirely.
+  image: python:3.12
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+/'
+    - if: '$CI_COMMIT_BRANCH == "develop"'
+  before_script:
+    - 'git config --global --add safe.directory "$CI_PROJECT_DIR"'
+    - pip install --no-cache-dir build twine
+  script:
+    - git fetch --tags --force
+    - git describe --tags --always   # show the version setuptools-scm will use
+    - python -m build
+    - twine check dist/*
+  artifacts:
+    paths:
+      - dist/
+    expire_in: 1 week
+
+# Manual dry-run upload to TestPyPI (any vX.Y.Z tag, including rc). Non-blocking.
+publish_testpypi:
+  stage: publish
+  image: python:3.12-slim
+  needs: ["build"]
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+/'
+      when: manual
+      allow_failure: true
+  variables:
+    TWINE_USERNAME: __token__
+    TWINE_PASSWORD: $TESTPYPI_API_TOKEN
+  before_script:
+    - pip install --no-cache-dir twine
+  script:
+    - 'twine upload --non-interactive --repository-url https://test.pypi.org/legacy/ dist/*'
+
+# Publish to PyPI. Final release tags only (no rc/dev suffix).
+publish_pypi:
+  stage: publish
+  image: python:3.12-slim
+  needs: ["build"]
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+$/'
+  variables:
+    TWINE_USERNAME: __token__
+    TWINE_PASSWORD: $PYPI_API_TOKEN
+  before_script:
+    - pip install --no-cache-dir twine
+  script:
+    - 'twine upload --non-interactive dist/*'
+

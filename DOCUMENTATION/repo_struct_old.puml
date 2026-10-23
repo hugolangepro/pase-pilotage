@@ -1,0 +1,18 @@
+@startwbs
+* PASE
+** DATABASE
+*** METEO
+*** OBJ
+**: INPUTS
+Contains yaml files for location info (lat, long, etc.) and PV central characteristics (panels spacing, azimuth, etc.) ;
+** MODULES
+*** CROP
+*** DATA_MANAGEMENT
+*** ENVIRONMENT
+*** PHOTOVOLTAICS
+***_ user_support_tools.py
+** OUTPUTS
+*** GRAPHS
+** TEMPORARY_FILES
+@endwbs
+

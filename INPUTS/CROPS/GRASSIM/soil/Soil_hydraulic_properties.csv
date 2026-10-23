@@ -1,0 +1,12 @@
+Texture;Code;SatConD;InfRate
+Sand;1;504;696
+Loamy_Sand;2;146.64;600
+Sandy_Loam;3;62.16;696
+Loam;4;31.68;360
+Silty_Loam;5;16.32;288
+Sandy_Clay_Loam;6;10.32;240
+Clay_Loam;7;5.52;168
+Silty_Clay_Loam;8;3.6;168
+Sandy_Clay;9;2.88;120
+Silty_Clay;10;2.16;96
+Clay;11;1.44;24
